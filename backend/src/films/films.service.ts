@@ -6,7 +6,7 @@ export class FilmsService {
     return `This action returns all films`;
   }
 
-  getSchedule(id: number) {
+  getSchedule(id: string) {
     return `This action returns a film by id: ${id}`;
   }
 }

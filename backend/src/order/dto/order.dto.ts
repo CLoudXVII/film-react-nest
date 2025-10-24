@@ -1,11 +1,46 @@
-import { UUID } from "node:crypto";
+import { Type } from 'class-transformer';
+import {
+  IsArray,
+  IsEmail,
+  IsNotEmpty,
+  IsNumber,
+  IsPositive,
+  IsString,
+  IsUUID,
+  ValidateNested,
+} from 'class-validator';
+
+export class TicketDTO {
+  @IsUUID()
+  @IsNotEmpty()
+  film: string;
+  @IsUUID()
+  @IsNotEmpty()
+  session: string;
+  @IsNotEmpty()
+  daytime: string;
+  @IsNumber()
+  @IsPositive()
+  @IsNotEmpty()
+  row: number;
+  @IsNumber()
+  @IsPositive()
+  @IsNotEmpty()
+  seat: number;
+  @IsNumber()
+  @IsPositive()
+  @IsNotEmpty()
+  price: number;
+}
 
 export class OrderDTO {
-  id: UUID;
-  film: UUID;
-  session: UUID;
-  daytime: string;
-  row: number;
-  seat: number;
-  price: number;
+  @IsEmail()
+  @IsNotEmpty()
+  email: string;
+  @IsString()
+  phone: string;
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => TicketDTO)
+  tickets: TicketDTO[];
 }

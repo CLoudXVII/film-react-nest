@@ -13,6 +13,6 @@ export class FilmsController {
 
   @Get(':id/schedule')
   getSchedule(@Param('id') id: string) {
-    return this.filmsService.getSchedule(+id);
+    return this.filmsService.getSchedule(id);
   }
 }
