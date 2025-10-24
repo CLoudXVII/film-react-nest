@@ -11,8 +11,8 @@ export class FilmsController {
     return this.filmsService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.filmsService.findOne(+id);
+  @Get(':id/schedule')
+  getSchedule(@Param('id') id: string) {
+    return this.filmsService.getSchedule(+id);
   }
 }
