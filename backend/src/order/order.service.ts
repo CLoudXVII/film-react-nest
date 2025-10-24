@@ -42,7 +42,7 @@ export class OrderService {
         `${ticket.row}:${ticket.seat}`,
       ]),
     );
-    
+
     return { total: tickets.length, items: tickets };
   }
 }
