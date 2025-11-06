@@ -24,7 +24,6 @@ export class OrderService {
       }
       uniqueTickets.add(seatId);
     }
-
     for (const ticket of tickets) {
       const film = await this.filmRepository.getSchedule(ticket.film);
       const session = film.find((session) => ticket.session === session.id);
@@ -36,13 +35,11 @@ export class OrderService {
         throw new BadRequestException(`Сиденье ${seat} уже занято`);
       }
     }
-
     tickets.forEach((ticket) =>
-      this.filmRepository.addTakenSeats(ticket.film, ticket.session, [
+      this.filmRepository.addTakenSeats(ticket.session, [
         `${ticket.row}:${ticket.seat}`,
       ]),
     );
-
     return { total: tickets.length, items: tickets };
   }
 }

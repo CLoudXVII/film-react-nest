@@ -1,13 +1,18 @@
-import { InjectModel } from '@nestjs/mongoose';
-import { Model, UpdateWriteOpResult } from 'mongoose';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable, NotFoundException } from '@nestjs/common';
 
-import { FilmDTO, ScheduleDTO } from '../films/dto/films.dto';
-import { Film, Schedule } from '../films/schemas/film.schema';
+import { FilmDTO, ScheduleDTO } from 'src/films/dto/films.dto';
+import { Film, Schedule } from 'src/films/entities/film.entity';
 
 @Injectable()
 export class FilmsRepository {
-  constructor(@InjectModel(Film.name) private filmModel: Model<Film>) {}
+  constructor(
+    @InjectRepository(Film)
+    private readonly film: Repository<Film>,
+    @InjectRepository(Schedule)
+    private readonly schedule: Repository<Schedule>,
+  ) {}
 
   private mapFilmDTO(film: Film): FilmDTO {
     return {
@@ -20,6 +25,7 @@ export class FilmsRepository {
       description: film.description,
       image: film.image,
       cover: film.cover,
+      schedule: film.schedule,
     };
   }
 
@@ -36,26 +42,27 @@ export class FilmsRepository {
   }
 
   async findAll(): Promise<FilmDTO[]> {
-    const films = await this.filmModel.find().exec();
+    const films = await this.film.find({ relations: { schedule: true } });
     return films.map((film) => this.mapFilmDTO(film));
   }
 
   async getSchedule(id: string): Promise<ScheduleDTO[]> {
-    const film = await this.filmModel.findOne({ id: id }).exec();
+    const film = await this.film.findOne({
+      where: { id },
+      relations: { schedule: true },
+    });
     if (!film) {
       throw new NotFoundException(`Не найдено раcписание на фильм с ID ${id}`);
     }
     return film.schedule.map((schedule) => this.mapScheduleDTO(schedule));
   }
 
-  async addTakenSeats(
-    filmID: string,
-    sessionID,
-    seats: string[],
-  ): Promise<UpdateWriteOpResult> {
-    return await this.filmModel.updateOne(
-      { id: filmID, 'schedule.id': sessionID },
-      { $push: { 'schedule.$.taken': { $each: seats } } },
-    );
+  async addTakenSeats(sessionID, seats: string[]) {
+    const schedule = await this.schedule.findOneBy({ id: sessionID });
+    if (!schedule) {
+      throw new NotFoundException(`Не найдено раcписание с ID ${sessionID}`);
+    }
+    schedule.taken = [...schedule.taken, ...seats];
+    return await this.schedule.save(schedule);
   }
 }

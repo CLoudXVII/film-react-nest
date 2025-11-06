@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Controller, Get, Param, ParseUUIDPipe } from '@nestjs/common';
 
 import { FilmsService } from './films.service';
 
@@ -12,7 +12,7 @@ export class FilmsController {
   }
 
   @Get(':id/schedule')
-  getSchedule(@Param('id') id: string) {
+  getSchedule(@Param('id', new ParseUUIDPipe()) id: string) {
     return this.filmsService.getSchedule(id);
   }
 }
