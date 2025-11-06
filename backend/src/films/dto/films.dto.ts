@@ -8,11 +8,12 @@ export class FilmDTO {
   description: string;
   image: string;
   cover: string;
+  schedule: ScheduleDTO[];
 }
 
 export class ScheduleDTO {
   id: string;
-  daytime: Date;
+  daytime: string;
   hall: number;
   rows: number;
   seats: number;
