@@ -1,21 +1,15 @@
-import { ConfigModule } from '@nestjs/config';
+import { ConfigService } from '@nestjs/config';
 
 export const configProvider = {
-  imports: [ConfigModule.forRoot()],
   provide: 'CONFIG',
-  useValue: <AppConfig>{
+  inject: [ConfigService],
+  useFactory: (configService: ConfigService) => ({
     database: {
-      driver: process.env.DATABASE_DRIVER || 'mongodb',
-      url: process.env.DATABASE_URL || 'mongodb://localhost:27017/afisha',
+      host: configService.get('DATABASE_HOST'),
+      port: configService.get('DATABASE_PORT'),
+      username: configService.get('DATABASE_USERNAME'),
+      password: configService.get('DATABASE_PASSWORD'),
+      name: configService.get('DATABASE_NAME'),
     },
-  },
+  }),
 };
-
-export interface AppConfig {
-  database: AppConfigDatabase;
-}
-
-export interface AppConfigDatabase {
-  driver: string;
-  url: string;
-}
