@@ -1,0 +1,88 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    image: ghcr.io/${GITHUB_USERNAME}/film-nest-backend:latest
+    environment: 
+      - DATABASE_DRIVER=postgres
+      - DATABASE_URL=${DATABASE_URL}
+      - DATABASE_USERNAME=${DATABASE_USERNAME}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - DATABASE_HOST=${DATABASE_HOST}
+      - DATABASE_PORT=${DATABASE_PORT}
+      - DATABASE_NAME=${DATABASE_NAME}
+      - LOGGER=${LOGGER}
+    container_name: backend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - postgres
+    restart: unless-stopped
+    networks:
+      - webnet
+
+  frontend:
+    build:
+      context: ./frontend
+    image: ghcr.io/${GITHUB_USERNAME}/film-nest-frontend:latest
+    environment:
+      - VITE_API_URL=/api/api/afisha
+      - VITE_CDN_URL=/content/afisha
+    container_name: frontend
+    networks:
+      - webnet
+    restart: on-failure
+    volumes:
+      - frontend_dist:/app/dist
+
+  postgres:
+    image: postgres:18-alpine
+    container_name: postgres
+    environment: 
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - webnet
+
+  pgadmin:
+    image: dpage/pgadmin4:9
+    container_name: pgadmin
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_DEFAULT_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_DEFAULT_PASSWORD}
+    ports:
+      - "8080:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    restart: unless-stopped
+    networks:
+      - webnet
+
+  nginx:
+    build:
+      context: ./nginx
+    image: ghcr.io/${GITHUB_USERNAME}/film-nest-nginx:latest
+    container_name: nginx
+    depends_on:
+      - frontend
+      - backend
+    ports:
+      - "80:80"
+    volumes:
+      - frontend_dist:/usr/share/nginx/html
+    restart: unless-stopped
+    networks:
+      - webnet
+
+
+volumes:
+  frontend_dist:
+  postgres_data:
+  pgadmin_data:
+
+networks:
+  webnet:

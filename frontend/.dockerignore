@@ -1,0 +1,12 @@
+node_modules/
+package-lock.json
+
+Dockerfile
+docker-compose.yml
+
+README.md
+LICENSE
+
+.idea/
+.vscode
+.DS_Store
