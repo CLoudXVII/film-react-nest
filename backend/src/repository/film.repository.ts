@@ -2,8 +2,8 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Injectable, NotFoundException } from '@nestjs/common';
 
-import { FilmDTO, ScheduleDTO } from 'src/films/dto/films.dto';
-import { Film, Schedule } from 'src/films/entities/film.entity';
+import { FilmDTO, ScheduleDTO } from '../films/dto/films.dto';
+import { Film, Schedule } from '../films/entities/film.entity';
 
 @Injectable()
 export class FilmsRepository {
